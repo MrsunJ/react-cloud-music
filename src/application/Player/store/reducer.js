@@ -14,7 +14,7 @@ const defaultState = fromJS({
   currentSong: {},
   colloctSong:{},
   speed: 1,
-  colloctList:[],
+  colloctList:window.sessionStorage.getItem("colloctList")||[],
   colloctSequencePlayList:[],
   colloctCurrentIndex:-1,
 });
@@ -70,18 +70,15 @@ const handleInsertSong = (state, song,type="play") => {
 }
 
 const handleDeleteSong = (state, song,type="play") => {
-    const {list,index,sequence} =  getOperatorNameSpace(type)
+  const {list,index,sequence} =  getOperatorNameSpace(type)
   const playList = JSON.parse(JSON.stringify(state.get(list).toJS()));
   const sequenceList = JSON.parse(JSON.stringify(state.get(sequence).toJS()));
   let currentIndex = state.get(index);
-
   const fpIndex = findIndex(song, playList);
   playList.splice(fpIndex, 1);
   if(fpIndex < currentIndex) currentIndex--;
-  
   const fsIndex = findIndex(song, sequenceList);
   sequenceList.splice(fsIndex, 1);
-
   return state.merge({
     [list]: fromJS(playList),
     [sequence]: fromJS(sequenceList),
@@ -115,11 +112,10 @@ export default (state = defaultState, action) => {
     case actionTypes.CHANGE_SPEED:
       return state.set('speed', action.data);
     case actionTypes.COLLOCT_INSERT_SONG:
+      console.log("COLLOCT_INSERT_SONG",111)
       return handleInsertSong(state, action.data,"collect");
-      break;
     case actionTypes.COLLOCT_DELETE_SONG:
       return handleDeleteSong(state, action.data,"collect");
-      break;
       case actionTypes.COLLOCT_SET_SONG:
       return state.set('colloctSong', action.data);
     default:
