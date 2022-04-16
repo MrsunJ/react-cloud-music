@@ -36,18 +36,7 @@ function PlayList(props) {
   const listWrapperRef = useRef();
   const playListRef = useRef();
   const confirmRef = useRef();
-  useEffect(()=>{
-    colloctListRef.current.immutableColloctList = immutableColloctList
-  },[immutableColloctList])
-  useEffect(()=>{
-      window.addEventListener("beforeunload", function (e) {
-        const {immutableColloctList} = colloctListRef.current;
-        window.sessionStorage.setItem("colloctList",immutableColloctList.toJS())
-      })
-      return ()=>{
-        window.removeEventListener('beforeunload',(e)=>{})
-      }
-  },[colloctListRef])
+
   const {
     currentIndex,
     currentSong: immutableCurrentSong,
@@ -57,7 +46,8 @@ function PlayList(props) {
     sequencePlayList: immutableSequencePlayList,
     colloctList: immutableColloctList,
     colloctSequencePlayList: immutableCollectSequencePlayList,
-    colloctCurrentIndex
+    colloctCurrentIndex,
+    colloctSong: immutableColloctSong
   } = props;
 
   const { clearPreSong } = props; //清空PreSong
@@ -72,10 +62,26 @@ function PlayList(props) {
     deleteColloctSong,
     insetColloctSong
   } = props;
-  const currentSong = isShowColloct ? immutableColloctList.toJS() : immutableCurrentSong.toJS();
+
+  useEffect(() => {
+    colloctListRef.current.immutableColloctList = immutableColloctList
+  }, [immutableColloctList]);
+  
+  useEffect(() => {
+    window.addEventListener("beforeunload", function (e) {
+      const { immutableColloctList } = colloctListRef.current;
+      window.sessionStorage.setItem("colloctList", immutableColloctList.toJS())
+    })
+    return () => {
+      window.removeEventListener('beforeunload', (e) => { })
+    }
+  }, [colloctListRef]);
+
+  const currentSong = isShowColloct ? immutableColloctSong.toJS() : immutableCurrentSong.toJS();
   const playList = isShowColloct ? immutableColloctList.toJS() : immutablePlayList.toJS();
   const sequencePlayList = isShowColloct ? immutableCollectSequencePlayList.toJS() : immutableSequencePlayList.toJS();
   const playIndex = isShowColloct ? colloctCurrentIndex : currentIndex;
+
   const changeMode = (e) => {
     let newMode = (mode + 1) % 3;
     if (newMode === 0) {
@@ -129,7 +135,7 @@ function PlayList(props) {
     }
   };
 
- 
+
   const handleShowClear = () => {
     confirmRef.current.show();
   }
@@ -199,13 +205,13 @@ function PlayList(props) {
     listWrapperRef.current.style[transform] = `translate3d(0px, 100%, 0px)`;
   }, [transform]);
   const handleOpenCollectList = () => setShowColloctList(!isShowColloct)
-  const handleInsetColloctList = (e,item) => {
+  const handleInsetColloctList = (e, item) => {
     e.stopPropagation();
     insetColloctSong(item)
   };
   const handleDeleteSong = (e, song) => {
     e.stopPropagation();
-    isShowColloct?deleteColloctSong(song): deleteSongDispatch(song) ;
+    isShowColloct ? deleteColloctSong(song) : deleteSongDispatch(song);
   };
 
   return (
@@ -252,7 +258,7 @@ function PlayList(props) {
                       <li className="item" key={item.id} onClick={() => handleChangeCurrentIndex(index)}>
                         {getCurrentIcon(item)}
                         <span className="text">{item.name} - {getName(item.ar)}</span>
-                        {findIndex(item,immutableColloctList)>1?"":  <span className="like" onClick={(e) => handleInsetColloctList(e, item)} >
+                        {findIndex(item, immutableColloctList) > 1 ? "" : <span className="like" onClick={(e) => handleInsetColloctList(e, item)} >
                           {getFavoriteIcon(item)}
                         </span>}
                         <span className="delete" onClick={(e) => handleDeleteSong(e, item)}>
@@ -280,6 +286,7 @@ const mapStateToProps = (state) => ({
   sequencePlayList: state.getIn(['player', 'sequencePlayList']),
   showPlayList: state.getIn(['player', 'showPlayList']),
   mode: state.getIn(['player', 'mode']),
+  colloctSong: state.getIn(['player', 'colloctSong']),
   colloctCurrentIndex: state.getIn(['player', 'colloctCurrentIndex']),
   colloctList: state.getIn(['player', 'colloctList']),
   colloctSequencePlayList: state.getIn(['player', 'colloctSequencePlayList']),
@@ -302,10 +309,10 @@ const mapDispatchToProps = (dispatch) => {
     deleteSongDispatch(data) {
       dispatch(deleteSong(data));
     },
-    insetColloctSong(data){
+    insetColloctSong(data) {
       dispatch(colloctInsertSong(data))
     },
-    deleteColloctSong(data){
+    deleteColloctSong(data) {
       dispatch(colloctDeleteSong(data))
     },
     clearDispatch() {

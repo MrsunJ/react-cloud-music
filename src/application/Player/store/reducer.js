@@ -12,11 +12,11 @@ const defaultState = fromJS({
   currentIndex: -1,
   showPlayList: false,
   currentSong: {},
-  colloctSong:{},
   speed: 1,
   colloctList:window.sessionStorage.getItem("colloctList")||[],
   colloctSequencePlayList:[],
   colloctCurrentIndex:-1,
+  colloctSong:{},
 });
 
 const getOperatorNameSpace = (type)=>type==="colloct"?{
@@ -36,6 +36,8 @@ const handleInsertSong = (state, song,type="play") => {
   let currentIndex = state.get(index);
   //看看有没有同款
   let fpIndex = findIndex(song, playList);
+  console.log("playList",playList);
+  
   // 如果是当前歌曲直接不处理
   if(fpIndex === currentIndex && currentIndex !== -1) return state;
   currentIndex++;
