@@ -64,14 +64,15 @@ function PlayList(props) {
   } = props;
 
   useEffect(() => {
-    colloctListRef.current.immutableColloctList = immutableColloctList
+    colloctListRef.current = {immutableColloctList}
   }, [immutableColloctList]);
   
   useEffect(() => {
     window.addEventListener("beforeunload", function (e) {
       const { immutableColloctList } = colloctListRef.current;
-      window.sessionStorage.setItem("colloctList", immutableColloctList.toJS())
-    })
+      window.sessionStorage.setItem("colloctList",JSON.stringify( immutableColloctList.toJS()))
+    });
+
     return () => {
       window.removeEventListener('beforeunload', (e) => { })
     }
@@ -258,7 +259,7 @@ function PlayList(props) {
                       <li className="item" key={item.id} onClick={() => handleChangeCurrentIndex(index)}>
                         {getCurrentIcon(item)}
                         <span className="text">{item.name} - {getName(item.ar)}</span>
-                        {findIndex(item, immutableColloctList) > 1 ? "" : <span className="like" onClick={(e) => handleInsetColloctList(e, item)} >
+                        {findIndex(item, immutableColloctList.toJS()) > -1 ? "" : <span className="like" onClick={(e) => handleInsetColloctList(e, item)} >
                           {getFavoriteIcon(item)}
                         </span>}
                         <span className="delete" onClick={(e) => handleDeleteSong(e, item)}>

@@ -2,6 +2,7 @@ import * as actionTypes from './constants';
 import { fromJS } from 'immutable';
 import { playMode } from './../../../api/config';
 import { findIndex } from '../../../api/utils';
+const storageColloctList = window.sessionStorage.getItem("colloctList");
 
 const defaultState = fromJS({
   fullScreen: false,
@@ -13,7 +14,7 @@ const defaultState = fromJS({
   showPlayList: false,
   currentSong: {},
   speed: 1,
-  colloctList:window.sessionStorage.getItem("colloctList")||[],
+  colloctList:storageColloctList?JSON.parse(storageColloctList):[],
   colloctSequencePlayList:[],
   colloctCurrentIndex:-1,
   colloctSong:{},
@@ -37,7 +38,7 @@ const handleInsertSong = (state, song,type="play") => {
   //看看有没有同款
   let fpIndex = findIndex(song, playList);
   console.log("playList",playList);
-  
+
   // 如果是当前歌曲直接不处理
   if(fpIndex === currentIndex && currentIndex !== -1) return state;
   currentIndex++;
@@ -114,10 +115,10 @@ export default (state = defaultState, action) => {
     case actionTypes.CHANGE_SPEED:
       return state.set('speed', action.data);
     case actionTypes.COLLOCT_INSERT_SONG:
-      console.log("COLLOCT_INSERT_SONG",111)
-      return handleInsertSong(state, action.data,"collect");
+      console.log("COLLOCT_INSERT_SONG",111);
+      return handleInsertSong(state, action.data,"colloct");
     case actionTypes.COLLOCT_DELETE_SONG:
-      return handleDeleteSong(state, action.data,"collect");
+      return handleDeleteSong(state, action.data,"colloct");
       case actionTypes.COLLOCT_SET_SONG:
       return state.set('colloctSong', action.data);
     default:
