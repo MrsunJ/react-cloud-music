@@ -1,4 +1,4 @@
-import { SET_CURRENT_SONG, SET_FULL_SCREEN, SET_PLAYING_STATE, SET_SEQUECE_PLAYLIST, SET_PLAYLIST, SET_PLAY_MODE, SET_CURRENT_INDEX, SET_SHOW_PLAYLIST, DELETE_SONG, INSERT_SONG, CHANGE_SPEED } from './constants';
+import { SET_CURRENT_SONG, SET_FULL_SCREEN, SET_PLAYING_STATE, SET_SEQUECE_PLAYLIST, SET_PLAYLIST, SET_PLAY_MODE, SET_CURRENT_INDEX, SET_SHOW_PLAYLIST, DELETE_SONG, INSERT_SONG, CHANGE_SPEED ,COLLOCT_DELETE_SONG,COLLOCT_INSERT_SONG} from './constants';
 import { fromJS } from 'immutable';
 import { getSongDetailRequest } from '../../../api/request';
 
@@ -57,6 +57,15 @@ export const deleteSong = (data) => ({
   data
 });
 
+export const colloctInsertSong = (data) => ({
+  type: COLLOCT_INSERT_SONG,
+  data
+});
+
+export const colloctDeleteSong = (data) => ({
+  type: COLLOCT_DELETE_SONG,
+  data
+});
 // const insertSong = (dispatch, getState, song) => {
 //   const playList = JSON.parse(JSON.stringify(getState().getIn(['player', 'playList']).toJS()));
 //   const sequenceList = JSON.parse(JSON.stringify(getState().getIn(['player', 'sequencePlayList']).toJS()));

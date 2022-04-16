@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const baseUrl = "http://localhost:3300";
+export const baseUrl = "https://3300-strikingly-reactcloudmus-c2hk8vhhctm.ws-us40.gitpod.io/";
 
 // axios的实例及拦截器配置
 const axiosInstance = axios.create({

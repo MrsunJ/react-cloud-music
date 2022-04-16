@@ -8,7 +8,7 @@ import {
   ScrollWrapper
 } from './style';
 import { connect } from "react-redux";
-import { changeShowPlayList, changePlayMode, deleteSong, changeSequecePlayList } from '../store/actionCreators';
+import { changeShowPlayList, changePlayMode, deleteSong, changeSequecePlayList,colloctInsertSong,colloctDeleteSong } from '../store/actionCreators';
 import { getName, shuffle, findIndex } from '../../../api/utils';
 import { changeCurrentSong, changeCurrentIndex, changePlayList, changePlayingState } from './../store/actionCreators';
 import { playMode } from './../../../api/config';
@@ -23,7 +23,7 @@ function PlayList(props) {
   const [startY, setStartY] = useState(0);
   const [initialed, setInitialed] = useState(0);
   const [distance, setDistance] = useState(0);
-
+  const [isShowColloct,setShowColloctList] = useState(false)
   const transform = prefixStyle("transform");
 
   const listContentRef = useRef();
@@ -37,7 +37,11 @@ function PlayList(props) {
     showPlayList,
     playList:immutablePlayList,
     mode,
-    sequencePlayList:immutableSequencePlayList
+    sequencePlayList:immutableSequencePlayList,
+    colloctList:immutableColloctList,
+    colloctSequencePlayList:immutableCollectSequencePlayList,
+    colloctCurrentIndex,
+    colloctSong:immutableColloctSong
   } = props;
 
   const { clearPreSong } = props; //清空PreSong
@@ -51,9 +55,10 @@ function PlayList(props) {
     clearDispatch
   } = props;
 
-  const currentSong = immutableCurrentSong.toJS();
-  const playList = immutablePlayList.toJS();
-  const sequencePlayList = immutableSequencePlayList.toJS();
+  const currentSong = isShowColloct ?immutableColloctSong.toJS():  immutableCurrentSong.toJS();
+  const playList = isShowColloct ? immutableColloctList.toJS() : immutablePlayList.toJS();
+  const sequencePlayList = isShowColloct ?immutableCollectSequencePlayList.toJS(): immutableSequencePlayList.toJS();
+  const playIndex = isShowColloct?colloctCurrentIndex:currentIndex;
 
   const changeMode = (e) => {
     let newMode = (mode + 1)%3;
@@ -73,7 +78,7 @@ function PlayList(props) {
   }
 
   const handleChangeCurrentIndex = (index) => {
-    if(currentIndex === index) return;
+    if(playIndex === index) return;
     changeCurrentIndexDispatch(index);
   }
 
@@ -181,6 +186,10 @@ function PlayList(props) {
     setIsShow(false);
     listWrapperRef.current.style[transform] = `translate3d(0px, 100%, 0px)`;
   }, [transform]);
+  const handleOpenCollectList = ()=> setShowColloctList(!isShowColloct)
+  const handleInsetColloctList = (item)=>{
+    
+  };
 
   return (
     <CSSTransition 
@@ -209,6 +218,7 @@ function PlayList(props) {
           <ListHeader>
             <h1 className="title">
               { getPlayMode() }
+              <i className="iconfont" onClick={handleOpenCollectList}>&#xe640;</i>
               <span className="iconfont clear" onClick={handleShowClear}>&#xe63d;</span>
             </h1>
           </ListHeader>
@@ -225,7 +235,7 @@ function PlayList(props) {
                       <li className="item" key={item.id} onClick={() => handleChangeCurrentIndex(index)}>
                         {getCurrentIcon(item)}
                         <span className="text">{item.name} - {getName(item.ar)}</span>
-                        <span className="like">
+                        <span className="like" onClick={(e)=>handleInsetColloctList(e,item)} >
                           {getFavoriteIcon(item)}
                         </span>
                         <span className="delete" onClick={(e) => handleDeleteSong(e, item)}>
@@ -252,7 +262,11 @@ const mapStateToProps = (state) => ({
   playList: state.getIn(['player', 'playList']),
   sequencePlayList: state.getIn(['player', 'sequencePlayList']),
   showPlayList: state.getIn(['player', 'showPlayList']),
-  mode: state.getIn(['player', 'mode'])
+  mode: state.getIn(['player', 'mode']),
+  colloctCurrentIndex:state.getIn(['player', 'colloctCurrentIndex']),
+  colloctList:state.getIn(['player', 'colloctList']),
+  colloctSequencePlayList: state.getIn(['player', 'colloctSequencePlayList']),
+
 });
 // 映射dispatch到props上
 const mapDispatchToProps = (dispatch) => {

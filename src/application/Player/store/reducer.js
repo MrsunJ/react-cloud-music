@@ -12,13 +12,28 @@ const defaultState = fromJS({
   currentIndex: -1,
   showPlayList: false,
   currentSong: {},
-  speed: 1
+  colloctSong:{},
+  speed: 1,
+  colloctList:[],
+  colloctSequencePlayList:[],
+  colloctCurrentIndex:-1,
 });
 
-const handleInsertSong = (state, song) => {
-  const playList = JSON.parse(JSON.stringify(state.get('playList').toJS()));
-  const sequenceList = JSON.parse(JSON.stringify(state.get('sequencePlayList').toJS()));
-  let currentIndex = state.get('currentIndex');
+const getOperatorNameSpace = (type)=>type==="colloct"?{
+  list:"colloctList",
+  sequence:"colloctSequencePlayList",
+  index:"colloctCurrentIndex"
+}:{
+  list:"playList",
+  sequence:"sequencePlayList",
+  index:"currentIndex"
+}
+
+const handleInsertSong = (state, song,type="play") => {
+  const {list,sequence,index} = getOperatorNameSpace(type)
+  const playList = JSON.parse(JSON.stringify(state.get(list).toJS()));
+  const sequenceList = JSON.parse(JSON.stringify(state.get(sequence).toJS()));
+  let currentIndex = state.get(index);
   //看看有没有同款
   let fpIndex = findIndex(song, playList);
   // 如果是当前歌曲直接不处理
@@ -48,16 +63,17 @@ const handleInsertSong = (state, song) => {
     }
   }
   return state.merge({
-    'playList': fromJS(playList),
-    'sequencePlayList': fromJS(sequenceList),
-    'currentIndex': fromJS(currentIndex),
+    [list]: fromJS(playList),
+    [sequence]: fromJS(sequenceList),
+    [index]: fromJS(currentIndex),
   });
 }
 
-const handleDeleteSong = (state, song) => {
-  const playList = JSON.parse(JSON.stringify(state.get('playList').toJS()));
-  const sequenceList = JSON.parse(JSON.stringify(state.get('sequencePlayList').toJS()));
-  let currentIndex = state.get('currentIndex');
+const handleDeleteSong = (state, song,type="play") => {
+    const {list,index,sequence} =  getOperatorNameSpace(type)
+  const playList = JSON.parse(JSON.stringify(state.get(list).toJS()));
+  const sequenceList = JSON.parse(JSON.stringify(state.get(sequence).toJS()));
+  let currentIndex = state.get(index);
 
   const fpIndex = findIndex(song, playList);
   playList.splice(fpIndex, 1);
@@ -67,9 +83,9 @@ const handleDeleteSong = (state, song) => {
   sequenceList.splice(fsIndex, 1);
 
   return state.merge({
-    'playList': fromJS(playList),
-    'sequencePlayList': fromJS(sequenceList),
-    'currentIndex': fromJS(currentIndex),
+    [list]: fromJS(playList),
+    [sequence]: fromJS(sequenceList),
+    [index]: fromJS(currentIndex),
   });
 }
 
@@ -98,6 +114,14 @@ export default (state = defaultState, action) => {
       return handleDeleteSong(state, action.data);
     case actionTypes.CHANGE_SPEED:
       return state.set('speed', action.data);
+    case actionTypes.COLLOCT_INSERT_SONG:
+      return handleInsertSong(state, action.data,"collect");
+      break;
+    case actionTypes.COLLOCT_DELETE_SONG:
+      return handleDeleteSong(state, action.data,"collect");
+      break;
+      case actionTypes.COLLOCT_SET_SONG:
+      return state.set('colloctSong', action.data);
     default:
       return state;
   }

@@ -9,3 +9,6 @@ export const SET_SHOW_PLAYLIST = 'player/SET_SHOW_PLAYLIST';
 export const INSERT_SONG = 'player/INSERT_SONG';
 export const DELETE_SONG = 'player/DELETE_SONG';
 export const CHANGE_SPEED = 'player/CHANGE_SPEED';
+export const COLLOCT_INSERT_SONG = "player/COLLOCT_INSERT_SONG";
+export const COLLOCT_DELETE_SONG = 'player/COLLOCT_DELETE_SONG';
+export const COLLOCT_SET_SONG = "player/COLLOCT_SET_SONG";
